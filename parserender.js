@@ -25,21 +25,9 @@ function changelogApp() {
                 this.loading = true;
                 this.error = null;
                 
-                // Fetch the changelog.md file
-                // Note: This can be easily modified to fetch from GitLab or other sources
-
-
-
-
-                try {
-  const response = await fetch('https://raw.githubusercontent.com/karacaismail/changelog/main/changelog.md');
-  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-  const text = await response.text();
-  // ... devamı
-} catch (e) {
-  error.value = "Changelog dosyası yüklenirken bir hata oluştu: " + e.message;
-}
-                
+                // Fetch the changelog.md file from GitHub Raw URL
+                // GitHub Pages doesn't serve .md files directly - use raw content URL
+                const response = await fetch('https://raw.githubusercontent.com/karacaismail/changelog/main/changelog.md');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -271,4 +259,3 @@ document.addEventListener('DOMContentLoaded', function() {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { changelogApp };
 }
-
