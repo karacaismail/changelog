@@ -1,0 +1,240 @@
+Aşağıda, yazılım geliştirme sürecinde yaygın olarak kullanılan **sürüm (release) türlerini** açıklayan bir tablo bulunmaktadır. Bu sürümler, yazılımın geliştirme, test, dağıtım ve üretim döngüsünde farklı aşamalara işaret eder.
+
+---
+
+### Yazılım Sürüm Türleri Tablosu
+
+| Sürüm Adı             | Kısaltma | Amaç / Durum                                   | Dağıtım           | Hedef Kitle           | Stabilite | Açıklama Kriterleri                               |
+| --------------------- | -------- | ---------------------------------------------- | ----------------- | --------------------- | --------- | ------------------------------------------------- |
+| **Development**       | `dev`    | Aktif geliştirme süreci                        | Dahili (local)    | Geliştiriciler        | Düşük     | Özellikler değişebilir, test kapsamı sınırlıdır.  |
+| **Nightly**           | -        | Günlük derleme (otomatik)                      | Dahili/public     | Geliştirici/Testçi    | Çok Düşük | Otomasyonla çıkan sürümler, hata ayıklama amaçlı. |
+| **Alpha**             | `α`      | İlk dış testler, temel işlevler tamamlandı     | Kısıtlı (closed)  | İç test grubu         | Düşük     | Yeni özellikler ekleniyor, çok hata olabilir.     |
+| **Beta**              | `β`      | Kararsız test sürümü, kullanıcı geri bildirimi | Genelde açık      | Gelişmiş kullanıcılar | Orta      | Ana işlevler tamam, ama bug olabilir.             |
+| **Release Candidate** | `RC`     | Yayına hazır sürüm adayı                       | Seçimli veya açık | QA / Son kullanıcılar | Yüksek    | Hatalar temizlenmiş, yayına hazırlanıyor.         |
+| **Stable / Final**    | `stable` | Kararlı, yayına alınmış sürüm                  | Genel erişim      | Tüm kullanıcılar      | Yüksek    | Yayınlanmış, destekleniyor.                       |
+| **Long Term Support** | `LTS`    | Uzun süreli destek sürümü                      | Genel erişim      | Kurumsal kullanıcılar | Yüksek    | Belirli süre boyunca güncelleme garantisi.        |
+| **Hotfix / Patch**    | `x.x.x`  | Kritik hata düzeltmeleri                       | Genel erişim      | Tüm kullanıcılar      | Yüksek    | Küçük sürüm artışı (örn. 2.1.4 → 2.1.5).          |
+| **Preview / Canary**  | -        | Gelecekteki sürümün ilk ön izlemesi            | Genelde açık      | Meraklı kullanıcılar  | Değişken  | Gelecekteki özellikler denenir.                   |
+| **Snapshot**          | -        | O anki durumun dondurulmuş hali                | Genelde dahili    | Geliştirici           | Değişken  | Genellikle versiyon kontrol sistemine bağlı.      |
+| **Pre-Release**       | `pre`    | RC ile Beta arası, bazen etiketlenmiş          | Seçimli veya açık | QA ve geliştiriciler  | Orta      | Spesifik testler için ayırılmış.                  |
+| **Rolling Release**   | -        | Sürekli güncellenen sürüm                      | Sürekli dağıtım   | Tüm kullanıcılar      | Değişken  | Versiyon yok, güncellemeler süreklidir.           |
+| **Deprecated**        | -        | Kullanımı önerilmeyen, destek dışı             | Erişilebilir      | Geliştiriciler        | Kırılgan  | Yerine yeni sürüm çıkmış, kullanılmamalı.         |
+
+---
+
+### Notlar:
+
+* **SemVer (Semantic Versioning)** sistemiyle genellikle sürüm numaraları şu yapıda verilir: `major.minor.patch` (örnek: `2.4.1`)
+
+  * `Major`: Geriye dönük uyumsuz değişiklik
+  * `Minor`: Yeni işlev ama uyumlu
+  * `Patch`: Hata düzeltmeleri
+* Örnek bir sürüm: `3.2.0-beta.5` → 3.2 sürümünün 5. beta versiyonu
+
+---
+
+### Assumption Mapping (Varsayımlar)
+
+| Varsayım                     | Test Yöntemi                                         |
+| ---------------------------- | ---------------------------------------------------- |
+| Tüm projeler bu sırayı izler | Açık kaynak projelerde sürüm geçmişi karşılaştırması |
+| Her beta → RC → stable olur  | Jira / GitHub release audit                          |
+
+---
+
+Amerika'daki yazılım mühendisleri, dokümantasyon, sürüm yönetimi ve takvim planlamasında aşağıdaki İngilizce terimleri kullanır. Kavramlar genelde **CI/CD**, **semver**, **release branching** sistemlerine gömülü olarak geçer. Aşağıda İngilizce sürüm türlerini ve mühendislik jargonundaki tam karşılıklarını, yaygın kullanımlarını ve notlarını görebilirsin:
+
+---
+
+### 📄 **Yazılım Sürüm Türleri – ABD Mühendislik Terminolojisi**
+
+| Türkçe Adı                  | İngilizce Terim         | Yaygın Kısaltma / Kullanım Örneği     | Not / Kullanım Biçimi                                  |
+| --------------------------- | ----------------------- | ------------------------------------- | ------------------------------------------------------ |
+| Geliştirme                  | Development build       | `dev`                                 | Genellikle `main` veya `develop` branch’te çalışılır   |
+| Gece Derlemesi              | Nightly build           | `nightly-20250804`                    | CI pipeline otomasyonu, genelde pre-merge test içindir |
+| Alpha                       | Alpha release           | `v2.0.0-alpha.1`                      | İlk test amaçlı sürüm, çok kararsız                    |
+| Beta                        | Beta release            | `v2.0.0-beta.3`                       | Daha geniş kullanıcı testleri için                     |
+| Sürüm Adayı                 | Release Candidate       | `v2.0.0-rc.1`                         | Production'a geçmeden son test sürümü                  |
+| Kararlı Sürüm               | Stable release          | `v2.0.0`                              | Yayına alınmış, production ortamına deploy edilir      |
+| Uzun Süreli Destek          | Long-Term Support (LTS) | `v2.0.0 (LTS)`                        | Genellikle 18-36 ay destek garantisi vardır            |
+| Hızlı Yama / Düzeltme       | Patch / Hotfix          | `v2.0.1` veya `hotfix/critical-issue` | Genellikle `main` üzerinden doğrudan patch             |
+| Ön İzleme Sürümü            | Preview / Early Access  | `preview`, `insider`, `early-access`  | Microsoft, Google gibi firmalarda sık görülür          |
+| Snapshot                    | Snapshot                | `snapshot-20250804`                   | Maven/Gradle gibi araçlarda geçici sürüm               |
+| Pre-Release                 | Pre-release             | `pre-release` flag (GitHub)           | Yayınlanmış ama `latest` değil, genelde test için      |
+| Sürekli Güncellenen Sürüm   | Rolling release         | `rolling` (örneğin Arch Linux)        | Versiyon yok, sürekli güncellenir                      |
+| Destek Dışı / Modası Geçmiş | Deprecated              | `deprecated`                          | API/sürüm kullanılmamalı, desteklenmez                 |
+
+---
+
+### 🔍 Jargon Kullanımı (ABD Mühendis Mektuplarında Geçen Şekliyle)
+
+* “Let’s bump to `beta.4` and ship it to staging.”
+* “RC is ready. Need final sign-off from QA.”
+* “This hotfix goes straight to production — branch off `release/2.3.1`.”
+* “We deprecated `v1.9` last quarter. No more security patches.”
+* “Nightly builds broke after the merge. Rollback `dev` branch.”
+* “`LTS` version is still used in enterprise environments.”
+
+---
+
+### 🎯 Notlar:
+
+* GitHub, GitLab, Bitbucket gibi platformlarda `Pre-release`, `Draft`, `Latest` gibi etiketler GUI üzerinde otomatik kullanılır.
+* CI/CD sistemleri (`Jenkins`, `GitHub Actions`, `CircleCI`) çoğunlukla bu sürüm tiplerini otomatik olarak versiyon dosyasından (`package.json`, `pom.xml`, `setup.py`, `version.txt`) çeker.
+* `SemVer` ([https://semver.org/](https://semver.org/)) ABD'de ve globalde **de-facto** standarttır.
+
+---
+
+### ⚠️ Falsification Kriterleri
+
+| İddia                                                        | Test                                                               |
+| ------------------------------------------------------------ | ------------------------------------------------------------------ |
+| ABD'de “preview” yerine “pre-release” daha yaygın kullanılır | GitHub / GitLab sürüm adlandırma örnekleri incelenerek test edilir |
+| “nightly” terimi yalnızca test amaçlıdır                     | Build pipeline log’ları ve artifact repo kontrolü yapılır          |
+
+---
+
+
+
+
+Bu koşullarda ihtiyaç olan şey yalnızca bir “changelog dosyası” değil, **sürüm yönetimi (versioning), değişiklik takibi (change tracking), sürüm iletişimi (release communication)** ve **otomasyon entegrasyonu** sağlayan bir sistemdir.
+
+---
+
+## 🎯 **Temel Gereksinim Tanımı (Derived from Context)**
+
+| Alan                                        | Gerekli mi? | Gerekçe                                              |
+| ------------------------------------------- | ----------- | ---------------------------------------------------- |
+| **Versioning sistemi (SemVer)**             | Evet        | 6 bağımsız proje, sürüm karşılaştırması gerek        |
+| **ChangeLog kaydı**                         | Evet        | Ekip içi + yatırımcı iletişimi                       |
+| **Makinece okunabilir yapı**                | Evet        | CI/CD otomasyonu için                                |
+| **İnsan okuyabilir açıklama**               | Evet        | Geliştirici & yatırımcı ile paylaşım                 |
+| **UI üzerinden görsel arayüz**              | Önerilir    | Non-tech stakeholder'lar için daha iyi algılanabilir |
+| **Otomasyon entegrasyonu (GitLab/Jenkins)** | Gerekli     | Pipeline trigger + sürüm etiketleme + dağıtım süreci |
+
+---
+
+## 📁 **Alternatif Kayıt Formatları ve Yapılar**
+
+### 1. **`CHANGELOG.md` (Markdown – İnsan Odaklı)**
+
+* 🔹 Avantaj: Kolay yazılır, okunur, git içinde versiyonlanır.
+* 🔹 Format:
+
+```md
+## [2.3.0] - 2025-08-05
+### Added
+- Kullanıcı arayüzüne dil seçimi eklendi.
+### Changed
+- API response'ları optimize edildi.
+### Fixed
+- Mobilde login hatası düzeltildi.
+```
+
+* 🔹 Standardize etmek için: [Keep a Changelog](https://keepachangelog.com/)
+
+### 2. **`changelog.json` veya `releases.json` (Makine Odaklı)**
+
+* 🔹 Avantaj: CI/CD ile kolay entegre edilir.
+* 🔹 Format:
+
+```json
+[
+  {
+    "version": "2.3.0",
+    "name": "Multilang support",
+    "type": "minor",
+    "date": "2025-08-05",
+    "changes": {
+      "added": ["Dil seçimi UI"],
+      "fixed": ["Login bug on mobile"],
+      "changed": ["Optimized API responses"]
+    }
+  }
+]
+```
+
+### 3. **GitHub / GitLab Releases (Web Arayüz Tabanlı)**
+
+* 🔹 Avantaj: UI üzerinden sürüm açıklaması girilir, Git tag ile eşleşir, otomatik changelog oluşturabilir.
+* 🔹 GitLab: `Release page` + `changelog.yaml` üzerinden otomasyon yapılabilir.
+* 🔹 Jenkins plugin: Git tag’ı otomatik çıkarabilir, changelog dosyasını alıp build sayfasına gömebilir.
+
+### 4. **`releases/` klasörü içinde modüler YAML dosyalar**
+
+* 🔹 Format: `releases/2.3.0.yaml`
+
+```yaml
+version: 2.3.0
+name: Multilang Support
+date: 2025-08-05
+type: minor
+changes:
+  added:
+    - Dil seçimi UI
+  fixed:
+    - Login bug on mobile
+  changed:
+    - Optimized API responses
+```
+
+* 🔹 Avantaj: Her sürüm kendi dosyasında, versiyon kontrolü net, CI/CD kolay entegre.
+
+---
+
+## 🎛️ **Görselleştirme / UI Panel Gerekli mi?**
+
+| Kullanıcı   | Görselleştirme Gerekir mi?        | Neden                        |
+| ----------- | --------------------------------- | ---------------------------- |
+| Geliştirici | Hayır (CLI veya markdown yeterli) | Fonksiyon odaklı             |
+| PO / PM     | Kısmen gerekli (HTML veya arayüz) | Sprint çıktısı takibi        |
+| Yatırımcı   | Evet                              | Değer üretimi görünür olmalı |
+
+💡 Önerilen: Her changelog sürümü, pipeline sonrası otomatik olarak bir **HTML changelog view**'a dönüştürülmeli (örnek: [`git-changelog-generator`](https://github.com/github-changelog-generator/github-changelog-generator)).
+
+---
+
+## 🧩 **Seçeneklerin Karar Matrisi**
+
+| Yöntem            | İnsan Okunabilir | Makine Okunabilir | Otomasyon Uyumlu  | UI'ye Gösterim      | Yönetim Zorluğu |
+| ----------------- | ---------------- | ----------------- | ----------------- | ------------------- | --------------- |
+| `CHANGELOG.md`    | ✅                | ❌                 | ⚠️ (parser gerek) | ⚠️ (dönüştürülmeli) | Kolay           |
+| `changelog.json`  | ⚠️               | ✅                 | ✅                 | ⚠️ (dönüştürülmeli) | Orta            |
+| GitLab Releases   | ✅                | ⚠️                | ✅                 | ✅                   | Kolay           |
+| `releases/*.yaml` | ✅                | ✅                 | ✅                 | ⚠️                  | Orta            |
+
+---
+
+## ✅ **Sizin İçin Önerilen Çözüm (Confidence: 90%)**
+
+### **Kombine yapı:**
+
+1. `CHANGELOG.md` → İnsanlar için okunabilir arşiv.
+2. `changelog.json` → CI/CD pipeline için entegre veri kaynağı.
+3. Git tag + GitLab Release page → Otomatik HTML changelog + sürüm iletişimi.
+4. Opsiyonel: `releases/2.3.0.yaml` gibi modüler veri dosyası sistemi, tekil sürümler için detay tutmak adına eklenebilir.
+
+---
+
+## 🔁 CI/CD Entegrasyonu
+
+* **Jenkins/GitLab Steps:**
+
+  1. Merge sonrası `version.json`’dan sürüm bilgisi çek.
+  2. `CHANGELOG.md` veya `.json` dosyasından ilgili kısmı al.
+  3. Git tag yarat: `git tag -a v2.3.0 -m "Multilang Support"`
+  4. GitLab Release API ile changelog’u gönder.
+  5. Otomatik HTML changelog oluştur (isteğe bağlı).
+
+---
+
+## 🔐 Falsifiye Edilebilir Varsayımlar
+
+| Varsayım                            | Test                                                                  |
+| ----------------------------------- | --------------------------------------------------------------------- |
+| Stakeholder’lar sade bir UI ister   | Geçmiş yatırımcı sunumları & PM geri bildirimi incelenmeli            |
+| JSON formatı otomasyon için yeterli | CI/CD pipeline dry-run yapılmalı                                      |
+| Tek dosya sürüm yönetimi yeterli    | 6 proje log karmaşasında dosya içeriği okunabilirliği analiz edilmeli |
+
+---
+
