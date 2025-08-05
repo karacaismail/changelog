@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog - Sürüm Geçmişi</title>
+    
+    <!-- Flowbite CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.css" rel="stylesheet" />
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Version state colors */
+        .state-pre-alpha { @apply bg-red-100 text-red-800 border-red-200; }
+        .state-alpha { @apply bg-orange-100 text-orange-800 border-orange-200; }
+        .state-beta { @apply bg-yellow-100 text-yellow-800 border-yellow-200; }
+        .state-rc { @apply bg-blue-100 text-blue-800 border-blue-200; }
+        .state-stable { @apply bg-green-100 text-green-800 border-green-200; }
+        .state-deprecated { @apply bg-gray-100 text-gray-800 border-gray-200; }
+        
+        /* Change type colors */
+        .change-added { @apply border-l-4 border-green-500 bg-green-50; }
+        .change-changed { @apply border-l-4 border-blue-500 bg-blue-50; }
+        .change-deprecated { @apply border-l-4 border-yellow-500 bg-yellow-50; }
+        .change-removed { @apply border-l-4 border-red-500 bg-red-50; }
+        .change-fixed { @apply border-l-4 border-purple-500 bg-purple-50; }
+        .change-security { @apply border-l-4 border-orange-500 bg-orange-50; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans antialiased" x-data="changelogApp()">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Changelog</h1>
+                    <p class="text-gray-600 mt-1">Sürüm geçmişi ve değişiklik günlüğü</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Loading indicator -->
+                    <div x-show="loading" class="flex items-center text-gray-500">
+                        <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Yükleniyor...
+                    </div>
+                    
+                    <!-- Version count -->
+                    <div x-show="!loading && versions.length > 0" class="text-sm text-gray-500">
+                        <span x-text="filteredVersions.length"></span> / <span x-text="versions.length"></span> sürüm
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <div class="flex flex-col lg:flex-row gap-4">
+                <!-- Search Input -->
+                <div class="flex-1">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Arama</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="search"
+                            x-model="searchQuery"
+                            placeholder="Sürüm, değişiklik veya açıklama ara..."
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
+                </div>
+                
+                <!-- State Filter -->
+                <div class="lg:w-48">
+                    <label for="stateFilter" class="block text-sm font-medium text-gray-700 mb-2">Durum Filtresi</label>
+                    <select 
+                        id="stateFilter"
+                        x-model="stateFilter"
+                        class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="">Tüm Durumlar</option>
+                        <option value="stable">Stable</option>
+                        <option value="rc">Release Candidate</option>
+                        <option value="beta">Beta</option>
+                        <option value="alpha">Alpha</option>
+                        <option value="pre-alpha">Pre-Alpha</option>
+                    </select>
+                </div>
+                
+                <!-- Change Type Filter -->
+                <div class="lg:w-48">
+                    <label for="changeFilter" class="block text-sm font-medium text-gray-700 mb-2">Değişiklik Türü</label>
+                    <select 
+                        id="changeFilter"
+                        x-model="changeTypeFilter"
+                        class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="">Tüm Türler</option>
+                        <option value="added">Added</option>
+                        <option value="changed">Changed</option>
+                        <option value="deprecated">Deprecated</option>
+                        <option value="removed">Removed</option>
+                        <option value="fixed">Fixed</option>
+                        <option value="security">Security</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Clear Filters -->
+            <div class="mt-4 flex justify-end">
+                <button 
+                    @click="clearFilters()"
+                    x-show="searchQuery || stateFilter || changeTypeFilter"
+                    class="text-sm text-gray-500 hover:text-gray-700 underline"
+                >
+                    Filtreleri Temizle
+                </button>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div x-show="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Hata</h3>
+                    <p class="mt-1 text-sm text-red-700" x-text="error"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Results -->
+        <div x-show="!loading && !error && filteredVersions.length === 0 && versions.length > 0" class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0118 12M6 20.291A7.962 7.962 0 016 12m0 8.291zm12 0A7.962 7.962 0 0118 12m0 8.291z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Sonuç bulunamadı</h3>
+            <p class="mt-1 text-sm text-gray-500">Arama kriterlerinize uygun sürüm bulunamadı.</p>
+        </div>
+
+        <!-- Versions List -->
+        <div class="space-y-8">
+            <template x-for="version in filteredVersions" :key="version.version">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden fade-in">
+                    <!-- Version Header -->
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <h2 class="text-xl font-semibold text-gray-900" x-text="version.version"></h2>
+                                <span 
+                                    x-show="version.codename"
+                                    x-text="'- ' + version.codename"
+                                    class="text-lg text-gray-600 font-medium"
+                                ></span>
+                                <span 
+                                    x-text="getStateBadge(version.state)"
+                                    :class="getStateClass(version.state)"
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                                ></span>
+                            </div>
+                            <div class="text-sm text-gray-500" x-text="version.date"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Changes -->
+                    <div class="p-6">
+                        <template x-for="(changes, type) in version.changes" :key="type">
+                            <div x-show="changes.length > 0" class="mb-6 last:mb-0">
+                                <h3 
+                                    x-text="getChangeTypeLabel(type)"
+                                    :class="getChangeTypeClass(type)"
+                                    class="text-sm font-semibold uppercase tracking-wide mb-3 px-3 py-2 rounded-md"
+                                ></h3>
+                                <ul class="space-y-2">
+                                    <template x-for="change in changes" :key="change">
+                                        <li 
+                                            x-text="change"
+                                            :class="getChangeTypeClass(type)"
+                                            class="text-gray-700 pl-4 py-2 rounded-md"
+                                        ></li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Empty State -->
+        <div x-show="!loading && !error && versions.length === 0" class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0118 12M6 20.291A7.962 7.962 0 016 12m0 8.291zm12 0A7.962 7.962 0 0118 12m0 8.291z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Henüz sürüm yok</h3>
+            <p class="mt-1 text-sm text-gray-500">Changelog dosyası bulunamadı veya boş.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-4xl mx-auto px-4 py-8 border-t border-gray-200 mt-12">
+        <div class="text-center text-sm text-gray-500">
+            <p>Bu changelog <a href="https://keepachangelog.com/" class="text-blue-600 hover:text-blue-800 underline" target="_blank">Keep a Changelog</a> standardına uygun olarak oluşturulmuştur.</p>
+            <p class="mt-1">Sürüm numaralandırması <a href="https://semver.org/" class="text-blue-600 hover:text-blue-800 underline" target="_blank">Semantic Versioning</a> kullanmaktadır.</p>
+        </div>
+    </footer>
+
+    <!-- Flowbite JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="parserender.js"></script>
+</body>
+</html>
+
